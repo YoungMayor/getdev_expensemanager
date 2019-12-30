@@ -11,6 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', "landing");
+
+Route::get("/expenses", "userExpenses@showExpense");
+Route::get("/new-expense", "userExpenses@showExpenseForm");
+Route::post("/save-expense", "saveExpense");
