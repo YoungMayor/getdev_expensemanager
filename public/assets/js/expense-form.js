@@ -13,11 +13,11 @@ $(function() {
     var currencyPattern = /^([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(\.[0-9][0-9])?\s*((E|e)(U|u)(R|r))?$/g;
     var replacePattern = /[^0-9\.]/g;
 
-    $("#exp_amt").on("keyup", function(e) {
+    $("#exp_amt").on("keyup change", function(e) {
         var thisValue = $(this).val();
         if (thisValue.match(currencyPattern)) {
             var numbersOnly = parseFloat(thisValue.replace(replacePattern, ""));
-            
+
             numbersOnly += 0.2 * numbersOnly;
 
             if (thisValue.match(/((E|e)(U|u)(R|r))/g)) {
@@ -36,6 +36,31 @@ $(function() {
 })
 
 $("#expense-form").submit(function(e){
+    var thisForm = this;
+    $(thisForm).children(".form-errors").html("");
     e.preventDefault();
-    startLoader(this, "Processing your expense");
-})
+
+    var params = "_token=" + $("meta[name='csrf-token']").attr("content");
+    $("#expense-form .aj-f").each(function(){
+        var thisName = $(this).attr("name");
+        var thisVal = $(this).val();
+        params += "&" + thisName + "=" + thisVal;
+    });
+    if ($("#expense-form #exp_amt_inEUR").prop("checked")){
+        params += "&inEuro=1";
+    }
+
+    startLoader(thisForm, "Processing. Please wait");
+    sendxhr(params, "save-expense", "JSON", "POST", function(response){
+        if (response.s){
+            alert("Your Expense has been saved successfully");
+            $("#expense-form .aj-sclear").val("").change();
+            stopLoader(thisForm);
+        }
+        if (response.e){
+            $(thisForm).children(".form-errors").html(response.e);
+        }
+
+        stopLoader(thisForm);
+    })
+});
