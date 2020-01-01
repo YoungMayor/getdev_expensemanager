@@ -39,7 +39,7 @@
             "database/factories"
         ],
         "files": [
-            "Helpers/ExchangeRatesAPI.php"
+            "helpers/ExchangeRatesAPI.php"
         ]
     },
     "autoload-dev": {
